@@ -1,0 +1,68 @@
+# Ustawienia trackera. Hasła i klucze NIE trafiają tutaj – ustawiasz je jako
+# "Secrets" w GitHubie (patrz README.md).
+
+email:
+  # Gmail: smtp.gmail.com / 587. iCloud: smtp.mail.me.com / 587.
+  smtp_host: smtp.gmail.com
+  smtp_port: 587
+  timezone: Europe/Warsaw
+
+analysis:
+  # Model AI z NVIDIA NIM (build.nvidia.com), który ocenia, czy wpis dotyczy spółki/branży.
+  # Klucz ustawiasz jako sekret NVIDIA_API_KEY. Inne modele: lista na build.nvidia.com/models.
+  # Przetestowane 16.10.2026: nemotron-3-super odpowiada w ~1 s; deepseek i glm nie odpowiadały,
+  # a kimi i mistral nie są dostępne dla tego konta.
+  base_url: https://integrate.api.nvidia.com/v1
+  model: nvidia/nemotron-3-super-120b-a12b
+  # Wymuszenie odpowiedzi w JSON. Wyłącz (false), jeśli wybrany model tego nie obsługuje.
+  json_mode: true
+  # Dodatkowe parametry zapytania; tu: wyłączone "myślenie" (szybciej, wystarcza do oceny).
+  extra_body:
+    chat_template_kwargs:
+      enable_thinking: false
+  # 5 = konkretna decyzja/inwestycja dot. nazwanej spółki, 4 = mocna pochwała/atak na spółkę
+  # albo nowe cło/zakaz/dotacja dla branży, 3 = ogólne gadanie o branży.
+  # Mail przychodzi tylko dla wpisów z oceną >= tej wartości.
+  min_importance: 4
+  # Ile ostatnich wpisów przeanalizować przy pierwszym uruchomieniu (mail powitalny).
+  welcome_items: 15
+
+# Źródła wypowiedzi. Każde RSS można dodać jako type: rss.
+sources:
+  - key: truth
+    name: Trump – Truth Social
+    type: truth_rss
+    url: https://www.trumpstruth.org/feed
+  - key: wh
+    name: Biały Dom – decyzje prezydenta
+    type: rss
+    url: https://www.whitehouse.gov/presidential-actions/feed/
+  # Przemówienia i oświadczenia (Trump, JD Vance, ministrowie).
+  - key: wh-remarks
+    name: Biały Dom – przemówienia
+    type: rss
+    url: https://www.whitehouse.gov/remarks/feed/
+  - key: wh-statements
+    name: Biały Dom – oświadczenia
+    type: rss
+    url: https://www.whitehouse.gov/briefings-statements/feed/
+
+# Transakcje giełdowe członków Izby Reprezentantów (STOCK Act).
+# Mail przychodzi tylko wtedy, gdy ktoś z listy zgłosi nową transakcję.
+trades:
+  enabled: true
+  # Nazwiska (wystarczy samo nazwisko).
+  watchlist:
+    - Pelosi      # Nancy Pelosi – najsłynniejsze transakcje w Kongresie, opcje na big tech
+    - Gottheimer  # Josh Gottheimer – bardzo aktywny, opcje (np. Microsoft)
+    - Fields      # Cleo Fields – jeden z najaktywniejszych w 2026, opcje na big tech
+    - Donalds     # Byron Donalds – kandydat Trumpa na gubernatora Florydy, aktywny inwestor
+  # false = pokazuj też transakcje wszystkich innych członków Izby powyżej min_amount.
+  only_watchlist: true
+  min_amount: 15001
+  # Max liczba zgłoszeń (PDF) przetwarzanych w jednym przebiegu.
+  max_filings_per_run: 60
+
+weekly:
+  # Z ilu ostatnich dni liczyć wyniki w niedzielnym podsumowaniu.
+  lookback_days: 365
