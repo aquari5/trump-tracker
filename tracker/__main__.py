@@ -117,7 +117,8 @@ def run_trades(cfg: dict, dry_run: bool) -> None:
     new = new[:tcfg.get("max_filings_per_run", 60)]
     log.info("%d House filings in index, %d to process", len(filings), len(new))
 
-    shown, processed, recorded = [], [], []
+    # Transactions are only recorded here; they reach the inbox in the Sunday summary.
+    processed, recorded = [], []
     for f in new:
         try:
             load_filing(f)
@@ -127,24 +128,15 @@ def run_trades(cfg: dict, dry_run: bool) -> None:
         processed.append(f)
         watched = emails.is_watched(f.name, watchlist)
         # Dividend reinvestments happen automatically; they say nothing about the politician's view.
-        f.transactions = [t for t in f.transactions
-                          if "reinvest" not in t["description"].lower()
-                          and (watched or t["amount_floor"] >= min_amount)]
         for t in f.transactions:
+            if "reinvest" in t["description"].lower() or not (watched or t["amount_floor"] >= min_amount):
+                continue
             day = date.fromisoformat(t["date"])
             t["price_then"] = get_close_on(t["ticker"], day)
             t["spy_then"] = get_close_on(BENCHMARK, day)
-            t["price_now"] = get_price(t["ticker"])
             recorded.append({"filed": f.filed.isoformat(), "name": f.name, "district": f.district,
-                             "doc_id": f.doc_id, "url": f.url,
-                             **{k: v for k, v in t.items() if k != "price_now"}})
-        if f.transactions or (f.scanned and watched):
-            shown.append(f)
-
-    if shown:
-        shown.sort(key=lambda f: (not emails.is_watched(f.name, watchlist), f.name))
-        subject, html = emails.render_trades(shown, watchlist, cfg)
-        emails.send(subject, html, cfg, dry_run)
+                             "doc_id": f.doc_id, "url": f.url, **t})
+        log.info("%s: %d transactions", f.name, len(f.transactions))
 
     if not dry_run:
         trades = store.load("trades", []) + recorded

@@ -3,7 +3,7 @@ name: Tracker
 on:
   schedule:
     - cron: "*/30 * * * *"   # wypowiedzi: co 30 minut
-    - cron: "15 13 * * *"    # transakcje Kongresu: sprawdzane codziennie, mail tylko gdy coś jest
+    - cron: "15 13 * * *"    # transakcje Kongresu: zapis po cichu, trafiają do niedzielnego maila
     - cron: "0 7 * * 0"      # podsumowanie: niedziela 07:00 UTC
   workflow_dispatch:
     inputs:

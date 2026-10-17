@@ -48,7 +48,7 @@ sources:
     url: https://www.whitehouse.gov/briefings-statements/feed/
 
 # Transakcje giełdowe członków Izby Reprezentantów (STOCK Act).
-# Mail przychodzi tylko wtedy, gdy ktoś z listy zgłosi nową transakcję.
+# Transakcje są zapisywane po cichu i pojawiają się w niedzielnym podsumowaniu (bez osobnych maili).
 trades:
   enabled: true
   # Nazwiska (wystarczy samo nazwisko).

@@ -1,8 +1,7 @@
 # Tracker polityków
 
 Sam śledzi, co Trump i jego administracja mówią o konkretnych spółkach, oraz jakie akcje kupują
-i sprzedają najgłośniejsi giełdowi gracze w Kongresie. Maile przychodzą tylko wtedy, gdy coś się
-dzieje, a Ty nie musisz nic robić.
+i sprzedają najgłośniejsi giełdowi gracze w Kongresie. Maile przychodzą tylko wtedy, gdy Trump powie coś ważnego, a transakcje polityków trafiają do niedzielnego podsumowania; nic się nie powtarza codziennie, a Ty nie musisz nic robić.
 
 Kogo śledzimy:
 
@@ -22,8 +21,7 @@ Co przychodzi na maila:
 | Mail | Kiedy | Co zawiera |
 |---|---|---|
 | 🔔 Alert | do ~30 min po wypowiedzi, tylko gdy dotyczy spółki lub branży | streszczenie po polsku, tickery, wpływ pozytywny lub negatywny, aktualny kurs |
-| 🏛️ Transakcja | gdy ktoś z listy zgłosi transakcję | co kupił lub sprzedał, za ile, i o ile kurs zmienił się od dnia transakcji |
-| 📊 Podsumowanie | w każdą niedzielę | jak zmieniły się kursy od wzmianki Trumpa i od transakcji polityków, w porównaniu z S&P 500 |
+| 📊 Podsumowanie | w każdą niedzielę | jak zmieniły się kursy od wzmianki Trumpa i od transakcji polityków (kto co kupił i sprzedał), w porównaniu z S&P 500 |
 
 Niedzielny mail przychodzi zawsze, więc jest też sygnałem, że tracker działa. Gdyby coś się zepsuło
 (np. padło źródło danych), GitHub sam wyśle Ci maila o nieudanym uruchomieniu.
