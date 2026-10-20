@@ -9,9 +9,16 @@ email:
 
 analysis:
   # Dostawcy AI, próbowani po kolei: jeśli pierwszy nie odpowiada, tracker bierze następnego.
+  # Kolejność wg testu z 20.10.2026: Groq najszybszy i najstabilniejszy, Gemini bywa przeciążony.
   # Dostawca bez ustawionego klucza (sekret w GitHubie) jest pomijany.
   # Wystarczy dowolny klucz, ale im więcej, tym mniejsza szansa, że wszystkie padną naraz.
   providers:
+    - name: groq                       # darmowy klucz: console.groq.com/keys
+      base_url: https://api.groq.com/openai/v1
+      key_env: GROQ_API_KEY
+      model: openai/gpt-oss-120b
+      extra_body:
+        reasoning_effort: low
     - name: gemini                     # darmowy klucz: aistudio.google.com/apikey
       base_url: https://generativelanguage.googleapis.com/v1beta/openai
       key_env: GEMINI_API_KEY
@@ -20,12 +27,6 @@ analysis:
       base_url: https://generativelanguage.googleapis.com/v1beta/openai
       key_env: GEMINI_API_KEY
       model: gemini-3.1-flash-lite
-    - name: groq                       # darmowy klucz: console.groq.com/keys
-      base_url: https://api.groq.com/openai/v1
-      key_env: GROQ_API_KEY
-      model: openai/gpt-oss-120b
-      extra_body:
-        reasoning_effort: low
     - name: nvidia                     # katalog NVIDII bywa niestabilny (modele znikają)
       base_url: https://integrate.api.nvidia.com/v1
       key_env: NVIDIA_API_KEY
