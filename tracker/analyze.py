@@ -90,12 +90,23 @@ Reply with one JSON object and nothing else, with exactly one entry for every in
 """
 
 
+def providers(cfg: dict) -> list[dict]:
+    """Configured AI providers that have an API key available, in order of preference."""
+    acfg = cfg["analysis"]
+    configured = acfg.get("providers") or [{
+        "name": "nvidia", "base_url": acfg.get("base_url") or DEFAULT_BASE_URL,
+        "key_env": "NVIDIA_API_KEY", "model": acfg.get("model") or DEFAULT_MODEL,
+        "extra_body": acfg.get("extra_body"), "json_mode": acfg.get("json_mode", True),
+    }]
+    return [p for p in configured if os.environ.get(p.get("key_env", ""))]
+
+
 def analyze(posts: list[Post], cfg: dict) -> dict[str, Analysis]:
     if not posts:
         return {}
-    if os.environ.get("NVIDIA_API_KEY"):
+    if providers(cfg):
         return analyze_with_llm(posts, cfg)
-    log.warning("NVIDIA_API_KEY not set - using company-name matching only")
+    log.warning("No AI provider key set - using company-name matching only")
     return analyze_with_keywords(posts)
 
 
@@ -112,39 +123,59 @@ def _batches(posts: list[Post]):
         yield batch
 
 
-def _chat(cfg: dict, user_content: str) -> str:
-    acfg = cfg["analysis"]
+def _call(prov: dict, user_content: str) -> str:
+    """One provider, up to two attempts. Raises ProviderError when it can't answer."""
     payload = {
-        "model": acfg.get("model") or DEFAULT_MODEL,
+        "model": prov["model"],
         "messages": [{"role": "system", "content": SYSTEM_PROMPT},
                      {"role": "user", "content": user_content}],
         "temperature": 0.2,
         "max_tokens": 16000,
     }
-    if acfg.get("json_mode", True):
+    if prov.get("json_mode", True):
         payload["response_format"] = {"type": "json_object"}
-    payload.update(acfg.get("extra_body") or {})
-    url = (acfg.get("base_url") or DEFAULT_BASE_URL).rstrip("/") + "/chat/completions"
-    headers = {"Authorization": f"Bearer {os.environ['NVIDIA_API_KEY']}", "Accept": "application/json"}
+    payload.update(prov.get("extra_body") or {})
+    url = prov["base_url"].rstrip("/") + "/chat/completions"
+    headers = {"Authorization": f"Bearer {os.environ[prov['key_env']]}", "Accept": "application/json"}
 
-    for attempt in range(3):
+    error = ""
+    for attempt in range(2):
         try:
-            resp = requests.post(url, json=payload, headers=headers, timeout=240)
+            resp = requests.post(url, json=payload, headers=headers, timeout=90)
         except requests.RequestException as e:
-            error = str(e)
+            error = type(e).__name__
         else:
             if resp.ok:
-                choice = resp.json()["choices"][0]
-                if choice.get("finish_reason") == "length":
-                    log.warning("Model reply cut off at max_tokens")
-                return choice["message"].get("content") or ""
-            if resp.status_code != 429 and resp.status_code < 500:
-                # Bad key, unknown model, unsupported option: fail the run so GitHub emails the owner.
-                raise RuntimeError(f"NVIDIA API {resp.status_code}: {resp.text[:500]}")
-            error = f"HTTP {resp.status_code}"
-        log.info("NVIDIA API attempt %d failed (%s)", attempt + 1, error)
-        time.sleep(15 * (attempt + 1))
-    raise TransientError(error)
+                try:
+                    choice = resp.json()["choices"][0]
+                    if choice.get("finish_reason") == "length":
+                        log.warning("Model reply cut off at max_tokens")
+                    return choice["message"].get("content") or ""
+                except (ValueError, KeyError, IndexError, TypeError):
+                    error = "malformed response"
+            else:
+                error = f"HTTP {resp.status_code}: {resp.text[:200]}"
+                if resp.status_code not in (429, 500, 502, 503, 504):
+                    break  # 401/403/404...: retrying the same model is pointless
+        if attempt == 0:
+            time.sleep(10)
+    raise ProviderError(error)
+
+
+class ProviderError(Exception):
+    pass
+
+
+def _chat(cfg: dict, user_content: str) -> str:
+    """Try each provider in order; the first one that answers wins."""
+    errors = []
+    for prov in providers(cfg):
+        try:
+            return _call(prov, user_content)
+        except ProviderError as e:
+            log.warning("Provider %s (%s) failed: %s", prov.get("name"), prov["model"], e)
+            errors.append(f"{prov.get('name')}: {e}")
+    raise TransientError("; ".join(errors) or "no provider available")
 
 
 def _parse(content: str) -> list:

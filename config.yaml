@@ -8,18 +8,32 @@ email:
   timezone: Europe/Warsaw
 
 analysis:
-  # Model AI z NVIDIA NIM (build.nvidia.com), który ocenia, czy wpis dotyczy spółki/branży.
-  # Klucz ustawiasz jako sekret NVIDIA_API_KEY. Inne modele: lista na build.nvidia.com/models.
-  # Przetestowane 16.10.2026: nemotron-3-super odpowiada w ~1 s; deepseek i glm nie odpowiadały,
-  # a kimi i mistral nie są dostępne dla tego konta.
-  base_url: https://integrate.api.nvidia.com/v1
-  model: nvidia/nemotron-3-super-120b-a12b
-  # Wymuszenie odpowiedzi w JSON. Wyłącz (false), jeśli wybrany model tego nie obsługuje.
-  json_mode: true
-  # Dodatkowe parametry zapytania; tu: wyłączone "myślenie" (szybciej, wystarcza do oceny).
-  extra_body:
-    chat_template_kwargs:
-      enable_thinking: false
+  # Dostawcy AI, próbowani po kolei: jeśli pierwszy nie odpowiada, tracker bierze następnego.
+  # Dostawca bez ustawionego klucza (sekret w GitHubie) jest pomijany.
+  # Wystarczy dowolny klucz, ale im więcej, tym mniejsza szansa, że wszystkie padną naraz.
+  providers:
+    - name: gemini                     # darmowy klucz: aistudio.google.com/apikey
+      base_url: https://generativelanguage.googleapis.com/v1beta/openai
+      key_env: GEMINI_API_KEY
+      model: gemini-2.5-flash
+    - name: groq                       # darmowy klucz: console.groq.com/keys
+      base_url: https://api.groq.com/openai/v1
+      key_env: GROQ_API_KEY
+      model: llama-3.3-70b-versatile
+    - name: nvidia                     # katalog NVIDII bywa niestabilny (modele znikają)
+      base_url: https://integrate.api.nvidia.com/v1
+      key_env: NVIDIA_API_KEY
+      model: nvidia/nemotron-3.5-lightning-30b-a3b
+      extra_body:
+        chat_template_kwargs:
+          enable_thinking: false
+    - name: nvidia-2
+      base_url: https://integrate.api.nvidia.com/v1
+      key_env: NVIDIA_API_KEY
+      model: nvidia/nemotron-3-ultra-550b-a55b
+      extra_body:
+        chat_template_kwargs:
+          enable_thinking: false
   # 5 = konkretna decyzja/inwestycja dot. nazwanej spółki, 4 = mocna pochwała/atak na spółkę
   # albo nowe cło/zakaz/dotacja dla branży, 3 = ogólne gadanie o branży.
   # Mail przychodzi tylko dla wpisów z oceną >= tej wartości.
