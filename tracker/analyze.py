@@ -23,10 +23,11 @@ log = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1"
 DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b"
-# Batches are capped by size as well as count: White House speeches can be very long.
-BATCH_ITEMS = 10
-BATCH_CHARS = 40000
-MAX_CHARS = 30000
+# Batches are small: the free Groq tier allows only 8000 tokens a minute. Long speeches are
+# cut to their opening, which is enough to see what the document is about.
+BATCH_ITEMS = 8
+BATCH_CHARS = 14000
+MAX_CHARS = 6000
 EFFECTS = ("positive", "negative", "mixed", "unclear")
 
 
@@ -158,7 +159,7 @@ def _call(prov: dict, user_content: str) -> str:
                 if resp.status_code not in (429, 500, 502, 503, 504):
                     break  # 401/403/404...: retrying the same model is pointless
         if attempt == 0:
-            time.sleep(10)
+            time.sleep(25)
     raise ProviderError(error)
 
 

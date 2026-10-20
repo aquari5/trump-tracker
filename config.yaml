@@ -19,7 +19,9 @@ analysis:
     - name: groq                       # darmowy klucz: console.groq.com/keys
       base_url: https://api.groq.com/openai/v1
       key_env: GROQ_API_KEY
-      model: llama-3.3-70b-versatile
+      model: openai/gpt-oss-120b
+      extra_body:
+        reasoning_effort: low
     - name: nvidia                     # katalog NVIDII bywa niestabilny (modele znikają)
       base_url: https://integrate.api.nvidia.com/v1
       key_env: NVIDIA_API_KEY
