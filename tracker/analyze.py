@@ -41,6 +41,7 @@ class Company:
     ticker: str
     effect: str
     reason: str
+    listed: bool = True
 
 
 @dataclass
@@ -74,12 +75,13 @@ link; 1 = not relevant. Proclamations of observances, months or days are at most
 they announce a new concrete measure.
 - companies: each affected company with its US ticker (ADR/OTC ticker for foreign firms if \
 one exists; tickers are verified afterwards, so give your best answer, "" only for \
-companies that are not publicly traded), effect (positive, negative, mixed, unclear), and \
-reason_pl: one short sentence in Polish explaining the link. Only companies named in the \
+companies that are not publicly traded; set "listed": false for those), effect (positive, negative, mixed, unclear), and \
+reason_pl: one short sentence in Polish explaining the link (at most 15 words). Only companies named in the \
 text or directly targeted by the measure; do not list companies you merely speculate about. \
 Countries and governments are not companies (a deal with Taiwan is not about TSMC).
 - sectors: affected sectors as short Polish nouns (e.g. "półprzewodniki", "stal").
-- summary_pl: one or two sentences in Polish saying what was announced or said.
+- summary_pl: ONE short sentence in Polish (at most 25 words) saying what was announced or said; \
+no side topics.
 
 Describe what was said and the direct link to the company; do not give investment advice \
 or price predictions.
@@ -87,7 +89,7 @@ or price predictions.
 Reply with one JSON object and nothing else, with exactly one entry for every input id, in this shape:
 {"items": [{"id": "<input id>", "relevant": true, "importance": 3, "summary_pl": "...", \
 "sectors": ["..."], "companies": [{"name": "...", "ticker": "...", "effect": "positive", \
-"reason_pl": "..."}]}]}
+"reason_pl": "...", "listed": true}]}]}
 """
 
 
@@ -124,8 +126,8 @@ def _batches(posts: list[Post]):
         yield batch
 
 
-def _call(prov: dict, user_content: str) -> str:
-    """One provider, up to two attempts. Raises ProviderError when it can't answer."""
+def _call(prov: dict, user_content: str, attempts: int = 2) -> str:
+    """One provider, up to `attempts` tries. Raises ProviderError when it can't answer."""
     payload = {
         "model": prov["model"],
         "messages": [{"role": "system", "content": SYSTEM_PROMPT},
@@ -140,9 +142,9 @@ def _call(prov: dict, user_content: str) -> str:
     headers = {"Authorization": f"Bearer {os.environ[prov['key_env']]}", "Accept": "application/json"}
 
     error = ""
-    for attempt in range(2):
+    for attempt in range(attempts):
         try:
-            resp = requests.post(url, json=payload, headers=headers, timeout=90)
+            resp = requests.post(url, json=payload, headers=headers, timeout=60)
         except requests.RequestException as e:
             error = type(e).__name__
         else:
@@ -158,8 +160,8 @@ def _call(prov: dict, user_content: str) -> str:
                 error = f"HTTP {resp.status_code}: {resp.text[:200]}"
                 if resp.status_code not in (429, 500, 502, 503, 504):
                     break  # 401/403/404...: retrying the same model is pointless
-        if attempt == 0:
-            time.sleep(25)
+        if attempt + 1 < attempts:
+            time.sleep(6)
     raise ProviderError(error)
 
 
@@ -170,9 +172,11 @@ class ProviderError(Exception):
 def _chat(cfg: dict, user_content: str) -> str:
     """Try each provider in order; the first one that answers wins."""
     errors = []
-    for prov in providers(cfg):
+    chain = providers(cfg)
+    for i, prov in enumerate(chain):
         try:
-            return _call(prov, user_content)
+            # The best model (first) and the last resort get a second try; the rest are skipped at once.
+            return _call(prov, user_content, attempts=2 if i in (0, len(chain) - 1) else 1)
         except ProviderError as e:
             log.warning("Provider %s (%s) failed: %s", prov.get("name"), prov["model"], e)
             errors.append(f"{prov.get('name')}: {e}")
@@ -197,7 +201,9 @@ def _to_analysis(item: dict) -> Analysis:
             continue
         ticker = re.sub(r"[^A-Z0-9.\-]", "", str(c.get("ticker") or "").upper())
         effect = c.get("effect") if c.get("effect") in EFFECTS else "unclear"
-        companies.append(Company(str(c.get("name") or ticker), ticker, effect, str(c.get("reason_pl") or "")))
+        listed = c.get("listed") not in (False, "false", "False")
+        companies.append(Company(str(c.get("name") or ticker), ticker if listed else "", effect,
+                                 str(c.get("reason_pl") or ""), listed))
     try:
         importance = max(1, min(5, int(item.get("importance", 1))))
     except (TypeError, ValueError):
@@ -257,6 +263,9 @@ def resolve_tickers(analyses) -> None:
         if not a.relevant:
             continue
         for c in a.companies:
+            if not c.listed:
+                c.ticker = ""  # e.g. a private ethanol producer must not match a listed namesake
+                continue
             candidates = [c.ticker, ticker_from_name(c.name), lookup_ticker(c.name)]
             c.ticker = next((t for t in candidates if t and get_price(t)), "")
 

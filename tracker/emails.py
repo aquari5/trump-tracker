@@ -11,6 +11,7 @@ from html import escape, unescape
 from typing import Optional
 from zoneinfo import ZoneInfo
 
+from .analyze import Company
 from .config import OUT_DIR
 
 log = logging.getLogger(__name__)
@@ -94,35 +95,46 @@ def card(inner: str) -> str:
 def render_alerts(hits: list, prices: dict, cfg: dict, welcome: bool = False) -> tuple[str, str]:
     """hits: list of (Post, Analysis), newest first."""
     tz = cfg["email"]["timezone"]
-    cards = []
+
+    # One line per statement, then ONE table of companies merged across all statements.
+    items = []
     for post, a in hits:
-        rows = []
-        for c in a.companies:
-            ticker = quote_link(c.ticker) if c.ticker else '<span style="color:#656d76">nienotowana</span>'
-            rows.append("<tr>" + td(f"<b>{escape(c.name)}</b><br>"
-                                    f'<span style="font-size:13px;color:{MUTED}">{escape(c.reason)}</span>')
-                        + td(ticker) + td(effect_badge(c.effect))
-                        + td(fmt_price(prices.get(c.ticker)), "right") + "</tr>")
-        table = ""
-        if rows:
-            table = ('<table style="width:100%;border-collapse:collapse;margin-top:10px">'
-                     f'<tr>{th("Spółka")}{th("Ticker")}{th("Wpływ")}{th("Cena teraz", "right")}</tr>'
-                     + "".join(rows) + "</table>")
-        sectors = (f'<div style="font-size:13px;color:{MUTED};margin-top:8px">Sektory: '
-                   f'{escape(", ".join(a.sectors))}</div>' if a.sectors else "")
-        original = post.title or post.text
-        if len(original) > 700:
-            original = original[:700].rsplit(" ", 1)[0] + " …"
         stars = "★" * a.importance + "☆" * (5 - a.importance)
-        cards.append(card(
+        items.append(
+            f'<div style="padding:10px 0;border-bottom:1px solid {LINE}">'
             f'<div style="font-size:12px;color:{MUTED}">{escape(post.source)} · {fmt_time(post.published, tz)}'
-            f' · <span title="waga" style="color:#a15c00">{stars}</span></div>'
-            f'<div style="font-size:16px;font-weight:600;margin:6px 0 8px">{escape(a.summary)}</div>'
-            f'<div style="font-size:13px;color:#3d444d;border-left:3px solid {LINE};padding-left:10px;'
-            f'white-space:pre-wrap">{escape(original)}</div>'
-            f"{table}{sectors}"
-            f'<div style="margin-top:10px;font-size:13px"><a href="{escape(post.url)}" '
-            f'style="color:#0969da">Zobacz oryginał →</a></div>'))
+            f' · <span style="color:#a15c00">{stars}</span></div>'
+            f'<div style="font-size:15px;font-weight:600;margin-top:3px">{escape(a.summary)} '
+            f'<a href="{escape(post.url)}" style="color:#0969da;font-weight:400;font-size:13px">oryginał →</a></div>'
+            f"</div>")
+
+    merged: dict = {}
+    sectors: list = []
+    for _, a in hits:
+        for s_ in a.sectors:
+            if s_ not in sectors:
+                sectors.append(s_)
+        for c in a.companies:
+            key = c.ticker or c.name
+            if key not in merged:
+                merged[key] = Company(c.name, c.ticker, c.effect, c.reason)
+            elif merged[key].effect != c.effect:
+                merged[key].effect = "mixed"
+    rows = []
+    for c in merged.values():
+        ticker = quote_link(c.ticker) if c.ticker else f'<span style="color:{MUTED}">nienotowana</span>'
+        rows.append("<tr>" + td(f"<b>{escape(c.name)}</b> {ticker}<br>"
+                                f'<span style="font-size:12px;color:{MUTED}">{escape(c.reason)}</span>')
+                    + td(effect_badge(c.effect))
+                    + td(fmt_price(prices.get(c.ticker)), "right") + "</tr>")
+    table = ""
+    if rows:
+        table = ('<h2 style="font-size:15px;margin:18px 0 4px">Spółki</h2>'
+                 '<table style="width:100%;border-collapse:collapse">'
+                 f'<tr>{th("Spółka")}{th("Wpływ")}{th("Cena teraz", "right")}</tr>' + "".join(rows) + "</table>")
+    sector_line = (f'<div style="font-size:13px;color:{MUTED};margin-top:10px">Sektory: '
+                   f'{escape(", ".join(sectors))}</div>' if sectors else "")
+    cards = [card("".join(items).replace(f"border-bottom:1px solid {LINE}", "", 1) + table + sector_line)]
 
     names = []
     for _, a in hits:
@@ -147,7 +159,7 @@ def render_alerts(hits: list, prices: dict, cfg: dict, welcome: bool = False) ->
         who = "Trump" if any(p.id.startswith("truth:") for p, _ in hits) else hits[0][0].source.split(" – ")[0]
         subject = f"🔔 {who}: {topic}" if topic else f"🔔 {who}: nowa wypowiedź o spółkach"
         title = "Nowa wypowiedź dotycząca spółek" if len(hits) == 1 else f"{len(hits)} nowe wypowiedzi dotyczące spółek"
-        subtitle = "Ceny w tabeli to ostatni kurs w chwili wysłania maila – zapisuję je, żeby później policzyć zmianę."
+        subtitle = "Ceny to ostatni kurs w chwili wysłania maila. Zapisuję je, żeby w niedzielę policzyć zmianę."
     return subject, layout(escape(title), escape(subtitle), "".join(cards), cfg)
 
 
