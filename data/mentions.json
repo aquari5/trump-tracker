@@ -1,0 +1,28 @@
+[
+ {
+  "recorded": "2026-10-20T01:11+00:00",
+  "posted": "2026-10-20T00:38:01+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42455",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117470441097872597",
+  "ticker": "V",
+  "name": "Visa",
+  "effect": "positive",
+  "importance": 4,
+  "price": 402.92,
+  "spy": 766.48
+ },
+ {
+  "recorded": "2026-10-20T01:11+00:00",
+  "posted": "2026-10-20T00:38:01+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42455",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117470441097872597",
+  "ticker": "MA",
+  "name": "Mastercard",
+  "effect": "positive",
+  "importance": 4,
+  "price": 616.4,
+  "spy": 766.48
+ }
+]
