@@ -15,7 +15,11 @@ analysis:
     - name: gemini                     # darmowy klucz: aistudio.google.com/apikey
       base_url: https://generativelanguage.googleapis.com/v1beta/openai
       key_env: GEMINI_API_KEY
-      model: gemini-2.5-flash
+      model: gemini-3-flash-preview      # sprawdzone 20.10.2026: odpowiada w 1-2 s
+    - name: gemini-lite
+      base_url: https://generativelanguage.googleapis.com/v1beta/openai
+      key_env: GEMINI_API_KEY
+      model: gemini-3.1-flash-lite
     - name: groq                       # darmowy klucz: console.groq.com/keys
       base_url: https://api.groq.com/openai/v1
       key_env: GROQ_API_KEY
