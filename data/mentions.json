@@ -258,5 +258,44 @@
   "importance": 4,
   "price": 81.915,
   "spy": 763.6007
+ },
+ {
+  "recorded": "2026-10-22T21:03+00:00",
+  "posted": "2026-10-22T20:41:16+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53260",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/presidential-determination-pursuant-to-section-303-of-the-defense-production-act-of-1950-as-amended-on-domestic-petroleum-production-refining-and-logistics-capacity-c139/",
+  "ticker": "XOM",
+  "name": "ExxonMobil",
+  "effect": "positive",
+  "importance": 4,
+  "price": 178.3,
+  "spy": 763.7176
+ },
+ {
+  "recorded": "2026-10-22T21:03+00:00",
+  "posted": "2026-10-22T20:41:16+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53260",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/presidential-determination-pursuant-to-section-303-of-the-defense-production-act-of-1950-as-amended-on-domestic-petroleum-production-refining-and-logistics-capacity-c139/",
+  "ticker": "CVX",
+  "name": "Chevron",
+  "effect": "positive",
+  "importance": 4,
+  "price": 227.0,
+  "spy": 763.7176
+ },
+ {
+  "recorded": "2026-10-22T21:03+00:00",
+  "posted": "2026-10-22T20:41:16+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53260",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/presidential-determination-pursuant-to-section-303-of-the-defense-production-act-of-1950-as-amended-on-domestic-petroleum-production-refining-and-logistics-capacity-c139/",
+  "ticker": "VLO",
+  "name": "Valero Energy",
+  "effect": "positive",
+  "importance": 4,
+  "price": 426.3,
+  "spy": 763.7176
  }
 ]
