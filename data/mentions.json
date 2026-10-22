@@ -232,5 +232,31 @@
   "importance": 4,
   "price": 343.99,
   "spy": 773.09
+ },
+ {
+  "recorded": "2026-10-22T20:00+00:00",
+  "posted": "2026-10-22T19:32:11+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53258",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/adjusting-imports-of-wind-turbines-and-their-parts-and-components-into-the-united-states/",
+  "ticker": "GEV",
+  "name": "GE Vernova",
+  "effect": "positive",
+  "importance": 4,
+  "price": 827.26,
+  "spy": 763.6007
+ },
+ {
+  "recorded": "2026-10-22T20:00+00:00",
+  "posted": "2026-10-22T19:32:11+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53258",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/adjusting-imports-of-wind-turbines-and-their-parts-and-components-into-the-united-states/",
+  "ticker": "NEE",
+  "name": "NextEra Energy",
+  "effect": "negative",
+  "importance": 4,
+  "price": 81.915,
+  "spy": 763.6007
  }
 ]
