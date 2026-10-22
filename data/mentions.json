@@ -219,5 +219,18 @@
   "importance": 4,
   "price": 191.42,
   "spy": 766.48
+ },
+ {
+  "recorded": "2026-10-22T05:02+00:00",
+  "posted": "2026-10-22T02:29:33+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42557",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117482204261904691",
+  "ticker": "AAPL",
+  "name": "Apple",
+  "effect": "positive",
+  "importance": 4,
+  "price": 343.99,
+  "spy": 773.09
  }
 ]
