@@ -297,5 +297,18 @@
   "importance": 4,
   "price": 426.3,
   "spy": 763.7176
+ },
+ {
+  "recorded": "2026-10-23T10:00+00:00",
+  "posted": "2026-10-23T03:22:05+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42683",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117488073122158937",
+  "ticker": "NYT",
+  "name": "The New York Times Company",
+  "effect": "negative",
+  "importance": 4,
+  "price": 69.42,
+  "spy": 762.3785
  }
 ]
