@@ -310,5 +310,18 @@
   "importance": 4,
   "price": 69.42,
   "spy": 762.3785
+ },
+ {
+  "recorded": "2026-10-25T17:18+00:00",
+  "posted": "2026-10-25T16:49:33+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42717",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117502572828225324",
+  "ticker": "FOXA",
+  "name": "Fox Corporation",
+  "effect": "negative",
+  "importance": 4,
+  "price": 66.6,
+  "spy": 759.97
  }
 ]
