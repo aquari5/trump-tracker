@@ -323,5 +323,31 @@
   "importance": 4,
   "price": 66.6,
   "spy": 759.97
+ },
+ {
+  "recorded": "2026-10-26T23:55+00:00",
+  "posted": "2026-10-26T22:10:52+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42750",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117509498609678965",
+  "ticker": "BKD",
+  "name": "Brookdale Senior Living",
+  "effect": "positive",
+  "importance": 4,
+  "price": 9.75,
+  "spy": 766.2882
+ },
+ {
+  "recorded": "2026-10-26T23:55+00:00",
+  "posted": "2026-10-26T22:10:52+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/42750",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117509498609678965",
+  "ticker": "ENSG",
+  "name": "The Ensign Group",
+  "effect": "positive",
+  "importance": 4,
+  "price": 176.92,
+  "spy": 766.2882
  }
 ]
