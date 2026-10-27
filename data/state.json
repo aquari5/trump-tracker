@@ -580,9 +580,13 @@
   "truth:https://www.trumpstruth.org/statuses/42797",
   "truth:https://www.trumpstruth.org/statuses/42798",
   "truth:https://www.trumpstruth.org/statuses/42799",
-  "truth:https://www.trumpstruth.org/statuses/42800"
+  "truth:https://www.trumpstruth.org/statuses/42800",
+  "truth:https://www.trumpstruth.org/statuses/42808",
+  "truth:https://www.trumpstruth.org/statuses/42806",
+  "truth:https://www.trumpstruth.org/statuses/42807",
+  "truth:https://www.trumpstruth.org/statuses/42805"
  ],
- "last_alerts_run": "2026-10-27T20:35+00:00",
+ "last_alerts_run": "2026-10-27T21:23+00:00",
  "seen_filings": [
   "20034201",
   "20033751",
