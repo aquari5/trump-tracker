@@ -587,9 +587,10 @@
   "truth:https://www.trumpstruth.org/statuses/42805",
   "truth:https://www.trumpstruth.org/statuses/42809",
   "truth:https://www.trumpstruth.org/statuses/42810",
-  "truth:https://www.trumpstruth.org/statuses/42811"
+  "truth:https://www.trumpstruth.org/statuses/42811",
+  "wh:https://www.whitehouse.gov/?p=53657"
  ],
- "last_alerts_run": "2026-10-28T19:21+00:00",
+ "last_alerts_run": "2026-10-28T20:10+00:00",
  "seen_filings": [
   "20034201",
   "20033751",

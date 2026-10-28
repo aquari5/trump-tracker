@@ -349,5 +349,31 @@
   "importance": 4,
   "price": 176.92,
   "spy": 766.2882
+ },
+ {
+  "recorded": "2026-10-28T20:10+00:00",
+  "posted": "2026-10-28T20:03:48+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53657",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/adjusting-imports-of-robotics-industrial-machinery-and-their-parts-and-components-into-the-united-states/",
+  "ticker": "ROK",
+  "name": "Rockwell Automation",
+  "effect": "positive",
+  "importance": 4,
+  "price": 443.81,
+  "spy": 772.55
+ },
+ {
+  "recorded": "2026-10-28T20:10+00:00",
+  "posted": "2026-10-28T20:03:48+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=53657",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/10/adjusting-imports-of-robotics-industrial-machinery-and-their-parts-and-components-into-the-united-states/",
+  "ticker": "TER",
+  "name": "Teradyne",
+  "effect": "positive",
+  "importance": 4,
+  "price": 311.8803,
+  "spy": 772.55
  }
 ]
