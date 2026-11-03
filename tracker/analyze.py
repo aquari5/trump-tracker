@@ -83,6 +83,14 @@ Countries and governments are not companies (a deal with Taiwan is not about TSM
 - summary_pl: ONE short sentence in Polish (at most 25 words) saying what was announced or said; \
 no side topics.
 
+New versus old news: Trump often repeats or inflates deals announced months earlier \
+("record 300 billion invested under my Administration"). If the item only restates, boasts \
+about or rounds up an investment, deal or policy that was already public, it is not new: \
+importance at most 3, and summary_pl must say he repeats it ("Trump przypomina/powtarza...") \
+and must not describe it as a new or upcoming investment. Only a newly announced action, deal \
+or figure counts as news. Never state as fact a number you cannot see in the text; report \
+his figures as his claims ("według Trumpa").
+
 Describe what was said and the direct link to the company; do not give investment advice \
 or price predictions.
 
