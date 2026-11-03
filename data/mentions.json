@@ -375,5 +375,18 @@
   "importance": 4,
   "price": 311.8803,
   "spy": 772.55
+ },
+ {
+  "recorded": "2026-11-03T13:36+00:00",
+  "posted": "2026-11-03T12:24:15+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/43308",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117552490475949368",
+  "ticker": "TSM",
+  "name": "TSMC",
+  "effect": "positive",
+  "importance": 4,
+  "price": 404.0,
+  "spy": 753.529
  }
 ]
