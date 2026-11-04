@@ -83,6 +83,11 @@ jobs:
           git add data/
           if ! git diff --cached --quiet; then
             git commit -m "Update tracker state"
-            git pull --rebase
-            git push
+            # GitHub occasionally rejects a push with a transient server error; retry before failing.
+            for attempt in 1 2 3 4 5; do
+              git pull --rebase && git push && exit 0
+              echo "Push attempt $attempt failed, retrying in $((attempt * 10))s"
+              sleep $((attempt * 10))
+            done
+            exit 1
           fi
