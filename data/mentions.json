@@ -388,5 +388,18 @@
   "importance": 4,
   "price": 404.0,
   "spy": 753.529
+ },
+ {
+  "recorded": "2026-11-07T20:26+00:00",
+  "posted": "2026-11-07T18:40:20+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/43508",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117576618491350292",
+  "ticker": "TKO",
+  "name": "TKO Group Holdings",
+  "effect": "unclear",
+  "importance": 4,
+  "price": 191.02,
+  "spy": 735.36
  }
 ]
