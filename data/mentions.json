@@ -401,5 +401,18 @@
   "importance": 4,
   "price": 191.02,
   "spy": 735.36
+ },
+ {
+  "recorded": "2026-11-10T22:29+00:00",
+  "posted": "2026-11-10T21:11:07+00:00",
+  "post_id": "wh:https://www.whitehouse.gov/?p=54356",
+  "source": "Biały Dom – decyzje prezydenta",
+  "url": "https://www.whitehouse.gov/presidential-actions/2026/11/presidential-determination-concerning-wildfire-suppression-activities-in-the-united-states/",
+  "ticker": "PRM",
+  "name": "Perimeter Solutions",
+  "effect": "positive",
+  "importance": 4,
+  "price": 30.72,
+  "spy": 750.4994
  }
 ]
