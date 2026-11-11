@@ -184,7 +184,17 @@ def run_weekly(cfg: dict, dry_run: bool) -> None:
     mention_rows = mention_rows[:30]
 
     # Trades: performance since the transaction date.
-    trades = [t for t in store.load("trades", []) if t["filed"] >= since[:10] and t.get("price_then")]
+    all_trades = store.load("trades", [])
+    # A price lookup can fail on the day a trade is recorded; try those again here.
+    refilled = False
+    for t in all_trades:
+        if not t.get("price_then"):
+            day = date.fromisoformat(t["date"])
+            t["price_then"], t["spy_then"] = get_close_on(t["ticker"], day), get_close_on(BENCHMARK, day)
+            refilled = refilled or bool(t["price_then"])
+    if refilled and not dry_run:
+        store.save("trades", all_trades)
+    trades = [t for t in all_trades if t["filed"] >= since[:10] and t.get("price_then")]
     trade_rows = []
     for t in trades:
         price_now = get_price(t["ticker"])

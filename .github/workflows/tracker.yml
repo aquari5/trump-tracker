@@ -2,7 +2,7 @@ name: Tracker
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # wypowiedzi: co 30 minut
+    - cron: "7,37 * * * *"   # wypowiedzi: co 30 minut (poza pełną godziną, gdy GitHub jest najbardziej obciążony)
     - cron: "15 13 * * *"    # transakcje Kongresu: zapis po cichu, trafiają do niedzielnego maila
     - cron: "0 7 * * 0"      # podsumowanie: niedziela 07:00 UTC
   workflow_dispatch:
