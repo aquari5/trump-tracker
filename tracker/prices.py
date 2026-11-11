@@ -15,7 +15,7 @@ NASDAQ = "https://api.nasdaq.com/api/quote/{sym}/info?assetclass={cls}"
 YAHOO = "https://query2.finance.yahoo.com/v8/finance/chart/{sym}?range=1d&interval=1d"
 NASDAQ_LOOKUP = "https://api.nasdaq.com/api/autocomplete/slookup/5?search={q}"
 NASDAQ_HIST = ("https://api.nasdaq.com/api/quote/{sym}/historical?assetclass={cls}"
-               "&fromdate={start}&todate={end}&limit=20")
+               "&fromdate={start}&todate={end}&limit=5000")
 YAHOO_HIST = "https://query2.finance.yahoo.com/v8/finance/chart/{sym}?period1={p1}&period2={p2}&interval=1d"
 
 _cache: dict[str, Optional[float]] = {}
@@ -92,14 +92,18 @@ def _to_float(value: str) -> float:
 
 
 def _nasdaq_close(ticker: str, day: date) -> Optional[float]:
+    # Ask for everything from `day` until today: with a narrow date window the API silently
+    # drops rows older than about a month, which would return a later day's price.
     for cls in _classes(ticker):
-        resp = session.get(NASDAQ_HIST.format(sym=ticker, cls=cls, start=day, end=day + timedelta(days=7)),
-                           timeout=15, headers={"Accept": "application/json"})
+        resp = session.get(NASDAQ_HIST.format(sym=ticker, cls=cls, start=day, end=date.today()),
+                           timeout=20, headers={"Accept": "application/json"})
         data = resp.json().get("data") if resp.ok else None
         rows = ((data or {}).get("tradesTable") or {}).get("rows") or []
         if rows:
             # Rows are newest first; the last one is the first trading day on/after `day`.
-            return _to_float(rows[-1]["close"])
+            first = datetime.strptime(rows[-1]["date"], "%m/%d/%Y").date()
+            if first - day <= timedelta(days=7):
+                return _to_float(rows[-1]["close"])
     return None
 
 
