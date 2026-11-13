@@ -1343,9 +1343,11 @@
   "wh-statements:https://www.whitehouse.gov/?p=54599",
   "wh-statements:https://www.whitehouse.gov/?p=54596",
   "wh-statements:https://www.whitehouse.gov/?p=54594",
-  "wh-statements:https://www.whitehouse.gov/?p=54591"
+  "wh-statements:https://www.whitehouse.gov/?p=54591",
+  "truth:https://www.trumpstruth.org/statuses/43565",
+  "truth:https://www.trumpstruth.org/statuses/43564"
  ],
- "last_alerts_run": "2026-11-12T22:42+00:00",
+ "last_alerts_run": "2026-11-13T03:23+00:00",
  "seen_filings": [
   "20034201",
   "20033751",
