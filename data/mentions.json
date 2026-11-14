@@ -544,5 +544,44 @@
   "importance": 4,
   "price": 165.3137,
   "spy": 754.96
+ },
+ {
+  "recorded": "2026-11-14T00:19+00:00",
+  "posted": "2026-11-13T22:52:34+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/43568",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117611584206041319",
+  "ticker": "DIS",
+  "name": "The Walt Disney Company",
+  "effect": "positive",
+  "importance": 4,
+  "price": 118.4,
+  "spy": 750.1
+ },
+ {
+  "recorded": "2026-11-14T00:19+00:00",
+  "posted": "2026-11-13T22:52:34+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/43568",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117611584206041319",
+  "ticker": "NFLX",
+  "name": "Netflix",
+  "effect": "positive",
+  "importance": 4,
+  "price": 61.96,
+  "spy": 750.1
+ },
+ {
+  "recorded": "2026-11-14T00:19+00:00",
+  "posted": "2026-11-13T22:52:34+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/43568",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117611584206041319",
+  "ticker": "PARA",
+  "name": "Paramount Global",
+  "effect": "positive",
+  "importance": 4,
+  "price": 0.0985,
+  "spy": 750.1
  }
 ]
