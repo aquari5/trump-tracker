@@ -5,6 +5,7 @@ import argparse
 import logging
 import sys
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from . import emails, store
 from .analyze import TransientError, analyze
@@ -216,11 +217,34 @@ def run_weekly(cfg: dict, dry_run: bool) -> None:
     }
     subject, html = emails.render_weekly(mention_rows, trade_rows, stats, cfg)
     emails.send(subject, html, cfg, dry_run)
+    if not dry_run:
+        state = store.load("state", {})
+        state["last_weekly"] = now.isoformat(timespec="minutes")
+        store.save("state", state)
+
+
+def run_auto(cfg: dict, dry_run: bool) -> None:
+    """Every run checks statements, then catches up on whatever is due. GitHub's scheduler
+    skips many runs, so jobs are not tied to exact cron times."""
+    run_alerts(cfg, dry_run)
+    state = store.load("state", {})
+    now = datetime.now(timezone.utc)
+
+    def older_than(key: str, hours: float) -> bool:
+        last = state.get(key)
+        return not last or now - datetime.fromisoformat(last) > timedelta(hours=hours)
+
+    if older_than("last_trades_run", 20):
+        run_trades(cfg, dry_run)
+    # Sunday summary: first run on Sunday after 08:00 Warsaw time, once a week.
+    local = now.astimezone(ZoneInfo(cfg["email"]["timezone"]))
+    if local.weekday() == 6 and local.hour >= 8 and older_than("last_weekly", 6 * 24):
+        run_weekly(cfg, dry_run)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m tracker")
-    parser.add_argument("mode", choices=["alerts", "trades", "weekly", "test-email"])
+    parser.add_argument("mode", choices=["auto", "alerts", "trades", "weekly", "test-email"])
     parser.add_argument("--dry-run", action="store_true",
                         help="don't send email or save state; write the email to out/ instead")
     args = parser.parse_args()
@@ -228,7 +252,9 @@ def main() -> None:
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
     cfg = load_config()
-    if args.mode == "alerts":
+    if args.mode == "auto":
+        run_auto(cfg, args.dry_run)
+    elif args.mode == "alerts":
         run_alerts(cfg, args.dry_run)
     elif args.mode == "trades":
         run_trades(cfg, args.dry_run)

@@ -160,7 +160,9 @@ def _call(prov: dict, user_content: str, attempts: int = 2) -> str:
                 try:
                     choice = resp.json()["choices"][0]
                     if choice.get("finish_reason") == "length":
-                        log.warning("Model reply cut off at max_tokens")
+                        # A truncated reply is unparseable JSON; let the next provider answer.
+                        raise ProviderError("reply cut off at the provider's output limit")
+                    log.info("Answered by %s (%s)", prov.get("name"), prov["model"])
                     return choice["message"].get("content") or ""
                 except (ValueError, KeyError, IndexError, TypeError):
                     error = "malformed response"

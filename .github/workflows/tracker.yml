@@ -2,16 +2,14 @@ name: Tracker
 
 on:
   schedule:
-    - cron: "7,37 * * * *"   # wypowiedzi: co 30 minut (poza pełną godziną, gdy GitHub jest najbardziej obciążony)
-    - cron: "15 13 * * *"    # transakcje Kongresu: zapis po cichu, trafiają do niedzielnego maila
-    - cron: "0 7 * * 0"      # podsumowanie: niedziela 07:00 UTC
+    - cron: "7,37 * * * *"   # co 30 min: wypowiedzi zawsze; transakcje raz na dobę; podsumowanie w niedzielę
   workflow_dispatch:
     inputs:
       mode:
         description: Co uruchomić
         type: choice
-        options: [test-email, alerts, trades, weekly]
-        default: test-email
+        options: [auto, test-email, alerts, trades, weekly]
+        default: auto
 
 permissions:
   contents: write
@@ -66,12 +64,9 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
-          case "$SCHEDULE" in
-            "15 13 * * *") mode=trades ;;
-            "0 7 * * 0")   mode=weekly ;;
-            "")            mode="${MANUAL_MODE:-alerts}" ;;
-            *)             mode=alerts ;;
-          esac
+          # Scheduled runs (and external triggers) use "auto": statements every time, trades and
+          # the Sunday summary whenever they are due, so a skipped cron slot loses nothing.
+          if [ -n "$SCHEDULE" ]; then mode=auto; else mode="${MANUAL_MODE:-auto}"; fi
           python -m tracker "$mode"
 
       - name: Save state
