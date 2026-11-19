@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import argparse
 import logging
+import subprocess
 import sys
+import time
 from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from . import emails, store
 from .analyze import TransientError, analyze
-from .config import load_config
+from .config import ROOT, load_config
 from .prices import get_close_on, get_price
 from .sources import fetch_feed, fetch_house_filings, load_filing
 
@@ -242,15 +244,60 @@ def run_auto(cfg: dict, dry_run: bool) -> None:
         run_weekly(cfg, dry_run)
 
 
+def commit_state() -> None:
+    """Commit data/ and push, so state survives even if the long run is cut short.
+    Pulls first, which also brings in any config.yaml edits made on github.com."""
+    def git(*args) -> bool:
+        return subprocess.run(["git", *args], cwd=ROOT).returncode == 0
+
+    git("add", "data")
+    if not git("diff", "--cached", "--quiet"):
+        git("commit", "-q", "-m", "Update tracker state")
+    for attempt in range(1, 6):
+        if git("pull", "-q", "--rebase") and git("push", "-q"):
+            return
+        log.warning("Saving state failed (attempt %d), retrying", attempt)
+        time.sleep(10 * attempt)
+    raise RuntimeError("could not push tracker state")
+
+
+def run_loop(dry_run: bool, hours: float, every_minutes: int) -> None:
+    """Stay up for `hours`, running `auto` every few minutes. GitHub's scheduler skips most
+    cron slots, so instead of many short runs the workflow keeps one long run going."""
+    end = time.monotonic() + hours * 3600
+    failures = 0
+    while True:
+        started = time.monotonic()
+        try:
+            run_auto(load_config(), dry_run)
+            failures = 0
+        except (Exception, SystemExit) as e:
+            failures += 1
+            log.exception("Run failed (%d in a row): %s", failures, e)
+            if failures >= 6:
+                raise RuntimeError("tracker keeps failing") from e
+        if not dry_run:
+            commit_state()
+        wait = every_minutes * 60 - (time.monotonic() - started)
+        if time.monotonic() + max(wait, 0) > end:
+            return
+        time.sleep(max(wait, 0))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m tracker")
-    parser.add_argument("mode", choices=["auto", "alerts", "trades", "weekly", "test-email"])
+    parser.add_argument("mode", choices=["loop", "auto", "alerts", "trades", "weekly", "test-email"])
+    parser.add_argument("--hours", type=float, default=5.5, help="loop: how long to stay up")
+    parser.add_argument("--every", type=int, default=10, help="loop: minutes between checks")
     parser.add_argument("--dry-run", action="store_true",
                         help="don't send email or save state; write the email to out/ instead")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
+    if args.mode == "loop":
+        run_loop(args.dry_run, args.hours, args.every)
+        return
     cfg = load_config()
     if args.mode == "auto":
         run_auto(cfg, args.dry_run)

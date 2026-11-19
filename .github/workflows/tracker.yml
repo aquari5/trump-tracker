@@ -1,30 +1,30 @@
 name: Tracker
 
+# The tracker runs as one long job ("loop", about 5.5 h) that checks for news every 10 minutes
+# and starts its successor just before it ends. GitHub's cron skips most slots, so the hourly
+# schedule below is only a safety net that restarts the chain if it ever breaks.
 on:
   schedule:
-    - cron: "7,37 * * * *"   # co 30 min: wypowiedzi zawsze; transakcje raz na dobę; podsumowanie w niedzielę
+    - cron: "7 * * * *"
   workflow_dispatch:
     inputs:
       mode:
         description: Co uruchomić
         type: choice
-        options: [auto, test-email, alerts, trades, weekly]
-        default: auto
+        options: [loop, test-email, auto, alerts, trades, weekly]
+        default: loop
 
 permissions:
   contents: write
-
-concurrency:
-  group: tracker
-  cancel-in-progress: false
+  actions: write   # lets a finishing run start the next one
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 350
     steps:
       # Until the email secrets exist, scheduled runs are skipped instead of failing every
-      # 30 minutes. A manual run still fails, so a test shows what is missing.
+      # hour. A manual run still fails, so a test shows what is missing.
       - name: Check secrets
         id: secrets
         env:
@@ -40,23 +40,43 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/checkout@v5
+      - name: Pick mode
+        id: mode
         if: steps.secrets.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANUAL_MODE: ${{ inputs.mode }}
+        run: |
+          mode="${MANUAL_MODE:-loop}"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          [ "$mode" = "loop" ] || exit 0
+          # Only one loop at a time. A newer run waits up to 10 min for an older one that is
+          # just finishing (the hand-over); if an older loop is still busy, this run steps aside.
+          for i in $(seq 1 20); do
+            older=$(gh run list -R "$GITHUB_REPOSITORY" --workflow tracker.yml --status in_progress \
+              --json databaseId --jq "[.[] | select(.databaseId < $GITHUB_RUN_ID)] | length")
+            if [ "$older" = "0" ]; then exit 0; fi
+            sleep 30
+          done
+          echo "::notice::Tracker już działa w innym uruchomieniu – to kończę."
+          echo "mode=skip" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v5
+        if: steps.mode.outputs.mode != 'skip' && steps.secrets.outputs.ready == 'true'
 
       - uses: actions/setup-python@v6
-        if: steps.secrets.outputs.ready == 'true'
+        if: steps.mode.outputs.mode != 'skip' && steps.secrets.outputs.ready == 'true'
         with:
           python-version: "3.12"
           cache: pip
 
       - run: pip install -r requirements.txt
-        if: steps.secrets.outputs.ready == 'true'
+        if: steps.mode.outputs.mode != 'skip' && steps.secrets.outputs.ready == 'true'
 
       - name: Run tracker
-        if: steps.secrets.outputs.ready == 'true'
+        if: steps.mode.outputs.mode != 'skip' && steps.secrets.outputs.ready == 'true'
         env:
-          SCHEDULE: ${{ github.event.schedule }}
-          MANUAL_MODE: ${{ inputs.mode }}
+          MODE: ${{ steps.mode.outputs.mode }}
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -64,17 +84,14 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
-          # Scheduled runs (and external triggers) use "auto": statements every time, trades and
-          # the Sunday summary whenever they are due, so a skipped cron slot loses nothing.
-          if [ -n "$SCHEDULE" ]; then mode=auto; else mode="${MANUAL_MODE:-auto}"; fi
-          python -m tracker "$mode"
-
-      - name: Save state
-        if: steps.secrets.outputs.ready == 'true'
-        run: |
-          [ -d data ] || exit 0
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m tracker "$MODE"
+
+      - name: Save state
+        if: steps.mode.outputs.mode != 'skip' && steps.mode.outputs.mode != 'loop' && steps.secrets.outputs.ready == 'true'
+        run: |
+          [ -d data ] || exit 0
           git add data/
           if ! git diff --cached --quiet; then
             git commit -m "Update tracker state"
@@ -86,3 +103,11 @@ jobs:
             done
             exit 1
           fi
+
+      # Hand over to a fresh loop. Also runs after a failed loop, so one bad hour doesn't stop
+      # the tracker (GitHub still emails about the failure).
+      - name: Start next loop
+        if: always() && steps.mode.outputs.mode == 'loop'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run tracker.yml -R "$GITHUB_REPOSITORY" -f mode=loop
