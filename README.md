@@ -20,7 +20,7 @@ Co przychodzi na maila:
 
 | Mail | Kiedy | Co zawiera |
 |---|---|---|
-| 🔔 Alert | do ~30 min po wypowiedzi, tylko gdy dotyczy spółki lub branży | streszczenie po polsku, tickery, wpływ pozytywny lub negatywny, aktualny kurs |
+| 🔔 Alert | zwykle do ~10 min od pojawienia się wpisu w archiwum, tylko gdy dotyczy spółki lub branży | streszczenie po polsku, tickery, wpływ pozytywny lub negatywny, aktualny kurs |
 | 📊 Podsumowanie | w każdą niedzielę | jak zmieniły się kursy od wzmianki Trumpa i od transakcji polityków (kto co kupił i sprzedał), w porównaniu z S&P 500 |
 
 Niedzielny mail przychodzi zawsze, więc jest też sygnałem, że tracker działa. Gdyby coś się zepsuło
@@ -34,7 +34,7 @@ Niedzielny mail przychodzi zawsze, więc jest też sygnałem, że tracker dział
 
 Wszystko działa za darmo na GitHub Actions, czyli na serwerach GitHuba. Twój komputer nie musi być włączony.
 
-- **Trump**: archiwum Truth Social [trumpstruth.org](https://www.trumpstruth.org), sprawdzane co 30 minut.
+- **Trump**: archiwum Truth Social [trumpstruth.org](https://www.trumpstruth.org), sprawdzane co 10 minut.
 - **Biały Dom**: decyzje prezydenta, przemówienia i oświadczenia z [whitehouse.gov](https://www.whitehouse.gov).
 - **Ocena wypowiedzi**: model Nemotron na NVIDIA NIM (darmowe API z [build.nvidia.com](https://build.nvidia.com))
   czyta każdy nowy wpis, ocenia go w skali 1–5 i wskazuje spółki z tickerami (sprawdzanymi w Nasdaq).
@@ -131,7 +131,7 @@ Edytuj `config.yaml` (na github.com: otwórz plik i kliknij ołówek). Najważni
 
 ## Koszty
 
-- GitHub: 0 zł (prywatne repo ma 2000 darmowych minut miesięcznie, tracker zużywa ok. 1500).
+- GitHub: 0 zł. Repo jest publiczne, a publiczne repo ma minuty GitHub Actions bez limitu. Sekrety (klucze, hasło, adres e-mail) pozostają ukryte.
 - NVIDIA NIM: 0 zł w ramach darmowego dostępu dla deweloperów (limit ok. 40 zapytań na minutę, tracker robi kilka na godzinę).
 - Maile: 0 zł.
 
@@ -145,7 +145,7 @@ Edytuj `config.yaml` (na github.com: otwórz plik i kliknij ołówek). Najważni
   Gdy ich dopiszesz do listy, dostaniesz tylko informację o nowym zgłoszeniu z linkiem do PDF.
 - Politycy mają do 45 dni na zgłoszenie transakcji, więc informacja przychodzi z opóźnieniem.
 - Wpisy Trumpa pochodzą z niezależnego archiwum, bo Truth Social blokuje automatyczny dostęp.
-- Harmonogram GitHuba bywa opóźniony o 5–20 minut.
+- Tracker działa jako jedno długie uruchomienie (ok. 5,5 h), które przed końcem startuje następne. Godzinny harmonogram GitHuba jest tylko zapasem, gdyby ten łańcuch się przerwał.
 
 ## Uruchomienie lokalne (opcjonalne)
 
