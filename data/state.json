@@ -1415,9 +1415,10 @@
   "truth:https://www.trumpstruth.org/statuses/43620",
   "truth:https://www.trumpstruth.org/statuses/43617",
   "truth:https://www.trumpstruth.org/statuses/43618",
-  "wh-statements:https://www.whitehouse.gov/?p=54863"
+  "wh-statements:https://www.whitehouse.gov/?p=54863",
+  "truth:https://www.trumpstruth.org/statuses/43633"
  ],
- "last_alerts_run": "2026-11-19T21:04+00:00",
+ "last_alerts_run": "2026-11-19T21:14+00:00",
  "seen_filings": [
   "20034201",
   "20033751",
