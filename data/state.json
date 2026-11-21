@@ -1431,9 +1431,12 @@
   "truth:https://www.trumpstruth.org/statuses/43645",
   "truth:https://www.trumpstruth.org/statuses/43646",
   "wh-statements:https://www.whitehouse.gov/?p=55029",
-  "wh-statements:https://www.whitehouse.gov/?p=55056"
+  "wh-statements:https://www.whitehouse.gov/?p=55056",
+  "wh:https://www.whitehouse.gov/?p=55072",
+  "wh:https://www.whitehouse.gov/?p=55074",
+  "wh-statements:https://www.whitehouse.gov/?p=55076"
  ],
- "last_alerts_run": "2026-11-21T02:26+00:00",
+ "last_alerts_run": "2026-11-21T02:37+00:00",
  "seen_filings": [
   "20034201",
   "20033751",
