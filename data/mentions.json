@@ -609,5 +609,18 @@
   "importance": 4,
   "price": 9.305,
   "spy": 695.895
+ },
+ {
+  "recorded": "2026-11-23T02:58+00:00",
+  "posted": "2026-11-23T02:54:45+00:00",
+  "post_id": "truth:https://www.trumpstruth.org/statuses/43709",
+  "source": "Trump – Truth Social",
+  "url": "https://truthsocial.com/@realDonaldTrump/117663497310955803",
+  "ticker": "NVDA",
+  "name": "Nvidia",
+  "effect": "positive",
+  "importance": 4,
+  "price": 128.3744,
+  "spy": 690.43
  }
 ]
