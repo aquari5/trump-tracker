@@ -1530,7 +1530,7 @@
   "truth:https://www.trumpstruth.org/statuses/43733",
   "truth:https://www.trumpstruth.org/statuses/43740"
  ],
- "last_alerts_run": "2026-11-26T11:43+00:00",
+ "last_alerts_run": "2026-11-26T11:53+00:00",
  "seen_filings": [
   "20034201",
   "20033751",
@@ -2012,8 +2012,10 @@
   "20036891",
   "20036883",
   "20035776",
-  "20036848"
+  "20036848",
+  "20036875",
+  "20036908"
  ],
- "last_trades_run": "2026-11-25T15:52+00:00",
+ "last_trades_run": "2026-11-26T11:53+00:00",
  "last_weekly": "2026-11-22T07:07+00:00"
 }
